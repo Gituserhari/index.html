@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hindi Word</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    color: #fff;
+    font-family: Helvetica, Arial, sans-serif;
+    padding: 14px;
+  }
+
+  /* ── SAVED STRIP (TOP) ── */
+  .saved-strip {
+    display: none;
+    border: 1px solid #1c1c1c;
+    background: #060606;
+    padding: 9px 11px;
+    margin-bottom: 16px;
+  }
+  .strip-label {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #333;
+    margin-bottom: 7px;
+  }
+  .strip-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .strip-hindi {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .strip-meta { flex: 1; min-width: 0; }
+  .strip-roman { font-size: 11px; color: #555; font-style: italic; }
+  .strip-english {
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .strip-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 7px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .strip-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+  .pill {
+    font-size: 10px;
+    color: #3a3a3a;
+    border: 1px solid #1c1c1c;
+    padding: 2px 7px;
+    cursor: pointer;
+    background: #000;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .pill.active { color: #ccc; border-color: #383838; }
+  .pill:active { background: #111; }
+  .strip-timer {
+    font-size: 9px;
+    color: #252525;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  /* ── MAIN WORD ── */
+  .main-label {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #3a3a3a;
+    margin-bottom: 12px;
+  }
+  .hindi {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 5px;
+    color: #fff;
+  }
+  .roman { font-size: 13px; color: #666; font-style: italic; margin-bottom: 11px; }
+  .word-divider { border: none; border-top: 1px solid #1a1a1a; margin-bottom: 11px; }
+  .english { font-size: 14px; color: #ccc; line-height: 1.5; }
+  .example { font-size: 11px; color: #3a3a3a; line-height: 1.5; margin-top: 7px; font-style: italic; }
+
+  /* ── BUTTONS ── */
+  .btn-row { display: flex; gap: 8px; margin-top: 16px; }
+  .btn {
+    flex: 1;
+    padding: 10px 6px;
+    background: #0d0d0d;
+    color: #fff;
+    border: 1px solid #242424;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  .btn:active { background: #1a1a1a; }
+  .btn-save { color: #777; border-color: #2a2a2a; }
+  .timer-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 7px;
+    font-size: 9px;
+    color: #2a2a2a;
+    letter-spacing: 1px;
+  }
+  #save-msg { color: #555; }
+
+  /* ── ARCHIVE ── */
+  .archive {
+    margin-top: 30px;
+    border-top: 1px solid #111;
+    padding-top: 16px;
+  }
+  .archive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .archive-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #303030;
+  }
+  .archive-count {
+    font-size: 9px;
+    color: #252525;
+    letter-spacing: 1px;
+  }
+  .word-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    align-items: baseline;
+  }
+  .pool-word {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .pool-hindi {
+    color: #bbb;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .pool-meaning {
+    font-size: 9px;
+    color: #363636;
+    font-style: italic;
+    margin-top: 1px;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- SAVED STRIP — TOP -->
+<div class="saved-strip" id="saved-strip">
+  <div class="strip-label">★ Saved · Rotating</div>
+  <div class="strip-row">
+    <div class="strip-hindi" id="sv-hindi">—</div>
+    <div class="strip-meta">
+      <div class="strip-roman" id="sv-roman"></div>
+      <div class="strip-english" id="sv-english"></div>
+    </div>
+  </div>
+  <div class="strip-footer">
+    <div class="strip-pills" id="saved-pills"></div>
+    <div class="strip-timer">next in <span id="saved-timer">—</span></div>
+  </div>
+</div>
+
+<!-- MAIN WORD -->
+<div class="main-label">Hindi · Word of the Moment</div>
+<div class="hindi" id="hindi">—</div>
+<div class="roman" id="roman"></div>
+<hr class="word-divider">
+<div class="english" id="english"></div>
+<div class="example" id="example"></div>
+
+<div class="btn-row">
+  <button class="btn" onclick="nextWord()">↻ New Word</button>
+  <button class="btn btn-save" onclick="saveWord()">★ Save Word</button>
+</div>
+<div class="timer-row">
+  <span id="save-msg"></span>
+  <span>next in <span id="main-timer">—</span></span>
+</div>
+
+<!-- ARCHIVE -->
+<div class="archive" id="archive" style="display:none">
+  <div class="archive-header">
+    <div class="archive-label">Learned Words</div>
+    <div class="archive-count" id="archive-count"></div>
+  </div>
+  <div class="word-pool" id="archive-list"></div>
+</div>
+
+<script>
+var words = [
+  { h: "नमस्ते", r: "Namaste", e: "Hello / Greetings", ex: "नमस्ते, आप कैसे हैं? — Hello, how are you?" },
+  { h: "धन्यवाद", r: "Dhanyavaad", e: "Thank you", ex: "आपकी मदद के लिए धन्यवाद। — Thank you for your help." },
+  { h: "पानी", r: "Paani", e: "Water", ex: "मुझे पानी चाहिए। — I need water." },
+  { h: "खाना", r: "Khaana", e: "Food / To eat", ex: "खाना बहुत अच्छा है। — The food is very good." },
+  { h: "घर", r: "Ghar", e: "Home / House", ex: "मेरा घर यहाँ है। — My home is here." },
+  { h: "प्यार", r: "Pyaar", e: "Love", ex: "मैं तुमसे प्यार करता हूँ। — I love you." },
+  { h: "दोस्त", r: "Dost", e: "Friend", ex: "वह मेरा अच्छा दोस्त है। — He is my good friend." },
+  { h: "समय", r: "Samay", e: "Time", ex: "समय बहुत कीमती है। — Time is very precious." },
+  { h: "सुंदर", r: "Sundar", e: "Beautiful / Handsome", ex: "यह जगह बहुत सुंदर है। — This place is very beautiful." },
+  { h: "किताब", r: "Kitaab", e: "Book", ex: "यह किताब दिलचस्प है। — This book is interesting." },
+  { h: "रास्ता", r: "Raasta", e: "Road / Path / Way", ex: "सही रास्ता कौन सा है? — Which is the right way?" },
+  { h: "सपना", r: "Sapna", e: "Dream", ex: "मेरा सपना पूरा हुआ। — My dream came true." },
+  { h: "आकाश", r: "Aakaash", e: "Sky", ex: "आकाश नीला है। — The sky is blue." },
+  { h: "मुस्कान", r: "Muskaan", e: "Smile", ex: "उसकी मुस्कान बहुत प्यारी है। — Her smile is very lovely." },
+  { h: "ज़िन्दगी", r: "Zindagi", e: "Life", ex: "ज़िन्दगी खूबसूरत है। — Life is beautiful." },
+  { h: "बात", r: "Baat", e: "Talk / Matter / Thing", ex: "कोई बात नहीं। — No problem / It's okay." },
+  { h: "काम", r: "Kaam", e: "Work", ex: "मेरा काम हो गया। — My work is done." },
+  { h: "रात", r: "Raat", e: "Night", ex: "रात को अच्छी नींद लो। — Sleep well at night." },
+  { h: "दिन", r: "Din", e: "Day", ex: "आज का दिन अच्छा है। — Today is a good day." },
+  { h: "बच्चा", r: "Bachcha", e: "Child / Baby", ex: "बच्चा बहुत खुश है। — The child is very happy." },
+  { h: "शहर", r: "Shahar", e: "City / Town", ex: "मुंबई एक बड़ा शहर है। — Mumbai is a big city." },
+  { h: "नाम", r: "Naam", e: "Name", ex: "आपका नाम क्या है? — What is your name?" },
+  { h: "खुशी", r: "Khushi", e: "Happiness / Joy", ex: "यह खबर सुनकर खुशी हुई। — I felt happy hearing this news." },
+  { h: "सच", r: "Sach", e: "Truth", ex: "हमेशा सच बोलो। — Always speak the truth." },
+  { h: "भूख", r: "Bhookh", e: "Hunger", ex: "मुझे बहुत भूख लगी है। — I am very hungry." },
+  { h: "नींद", r: "Neend", e: "Sleep", ex: "मुझे नींद आ रही है। — I am feeling sleepy." },
+  { h: "मौसम", r: "Mausam", e: "Weather / Season", ex: "आज का मौसम अच्छा है। — Today's weather is nice." },
+  { h: "आवाज़", r: "Aawaaz", e: "Voice / Sound", ex: "उसकी आवाज़ मीठी है। — Her voice is sweet." },
+  { h: "याद", r: "Yaad", e: "Memory / To remember", ex: "तुम्हारी याद आती है। — I miss you." },
+  { h: "शुक्रिया", r: "Shukriya", e: "Thank you (Urdu-Hindi)", ex: "बहुत शुक्रिया। — Thank you very much." }
+];
+
+/* ── STORAGE ── */
+function storageGet(key) {
+  try { var r = localStorage.getItem(key); return r ? JSON.parse(r) : null; } catch(e) { return null; }
+}
+function storageSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+}
+
+/* ── STATE ── */
+var currentIdx   = -1;
+var seen         = [];
+var mainInterval = null;
+var mainCountdown = 0;
+
+var saved        = storageGet("hindi_saved_v2") || [];
+var savedIdx     = 0;
+var savedInterval = null;
+var savedCountdown = 0;
+
+function randInterval() { return 30 + Math.floor(Math.random() * 31); }
+
+function pickRandom() {
+  if (seen.length === words.length) seen = [];
+  var available = [];
+  for (var i = 0; i < words.length; i++) {
+    if (seen.indexOf(i) === -1) available.push(i);
+  }
+  var pick = available[Math.floor(Math.random() * available.length)];
+  seen.push(pick);
+  return pick;
+}
+
+/* ── MAIN WORD ── */
+function showMain(idx) {
+  currentIdx = idx;
+  var w = words[idx];
+  document.getElementById("hindi").textContent   = w.h;
+  document.getElementById("roman").textContent   = w.r;
+  document.getElementById("english").textContent = w.e;
+  document.getElementById("example").textContent = w.ex;
+}
+
+function startMainTimer(sec) {
+  mainCountdown = sec;
+  document.getElementById("main-timer").textContent = mainCountdown + "s";
+  if (mainInterval) clearInterval(mainInterval);
+  mainInterval = setInterval(function() {
+    mainCountdown--;
+    document.getElementById("main-timer").textContent = mainCountdown + "s";
+    if (mainCountdown <= 0) {
+      clearInterval(mainInterval);
+      showMain(pickRandom());
+      startMainTimer(randInterval());
+    }
+  }, 1000);
+}
+
+function nextWord() {
+  showMain(pickRandom());
+  startMainTimer(randInterval());
+}
+
+/* ── SAVE WORD ── */
+function saveWord() {
+  if (currentIdx === -1) return;
+  var w = words[currentIdx];
+  for (var i = 0; i < saved.length; i++) {
+    if (saved[i].h === w.h) { flashMsg("already saved"); return; }
+  }
+  saved.push({ h: w.h, r: w.r, e: w.e });
+  storageSet("hindi_saved_v2", saved);
+  flashMsg("★ saved!");
+  if (saved.length === 1) {
+    showSavedWord(0);
+    startSavedTimer(randInterval());
+    document.getElementById("saved-strip").style.display = "block";
+  }
+  renderStripPills();
+  renderArchive();
+}
+
+function flashMsg(msg) {
+  var el = document.getElementById("save-msg");
+  el.textContent = msg;
+  setTimeout(function() { el.textContent = ""; }, 1800);
+}
+
+/* ── SAVED STRIP ── */
+function showSavedWord(idx) {
+  savedIdx = idx;
+  var w = saved[idx];
+  document.getElementById("sv-hindi").textContent   = w.h;
+  document.getElementById("sv-roman").textContent   = w.r;
+  document.getElementById("sv-english").textContent = w.e;
+  renderStripPills();
+}
+
+function startSavedTimer(sec) {
+  savedCountdown = sec;
+  document.getElementById("saved-timer").textContent = savedCountdown + "s";
+  if (savedInterval) clearInterval(savedInterval);
+  savedInterval = setInterval(function() {
+    savedCountdown--;
+    document.getElementById("saved-timer").textContent = savedCountdown + "s";
+    if (savedCountdown <= 0) {
+      clearInterval(savedInterval);
+      savedIdx = (savedIdx + 1) % saved.length;
+      showSavedWord(savedIdx);
+      startSavedTimer(randInterval());
+    }
+  }, 1000);
+}
+
+function jumpToSaved(idx) {
+  showSavedWord(idx);
+  startSavedTimer(randInterval());
+}
+
+function renderStripPills() {
+  var el = document.getElementById("saved-pills");
+  el.innerHTML = "";
+  for (var i = 0; i < saved.length; i++) {
+    (function(i) {
+      var p = document.createElement("span");
+      p.className = "pill" + (i === savedIdx ? " active" : "");
+      p.textContent = saved[i].r;
+      p.onclick = function() { jumpToSaved(i); };
+      el.appendChild(p);
+    })(i);
+  }
+}
+
+/* ── ARCHIVE ── */
+function renderArchive() {
+  if (saved.length === 0) {
+    document.getElementById("archive").style.display = "none";
+    return;
+  }
+  document.getElementById("archive").style.display = "block";
+  document.getElementById("archive-count").textContent = saved.length + " word" + (saved.length !== 1 ? "s" : "");
+
+  var list = document.getElementById("archive-list");
+  list.innerHTML = "";
+
+  // varying sizes to give an organic pool feel
+  var sizes = [13, 16, 19, 15, 22, 14, 18, 20, 13, 17];
+
+  for (var i = 0; i < saved.length; i++) {
+    var w    = saved[i];
+    var size = sizes[i % sizes.length];
+
+    var wrap = document.createElement("div");
+    wrap.className = "pool-word";
+
+    var hindi = document.createElement("span");
+    hindi.className = "pool-hindi";
+    hindi.textContent = w.h;
+    hindi.style.fontSize = size + "px";
+
+    var meaning = document.createElement("span");
+    meaning.className = "pool-meaning";
+    meaning.textContent = w.r + " · " + w.e;
+
+    wrap.appendChild(hindi);
+    wrap.appendChild(meaning);
+    list.appendChild(wrap);
+  }
+}
+
+/* ── INIT ── */
+showMain(pickRandom());
+startMainTimer(randInterval());
+
+if (saved.length > 0) {
+  document.getElementById("saved-strip").style.display = "block";
+  showSavedWord(0);
+  startSavedTimer(randInterval());
+}
+renderArchive();
+</script>
+</body>
+</html>
